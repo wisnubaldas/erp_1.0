@@ -14,11 +14,35 @@ var host = window.location.host;
 // stackoverflow.com
 var pathArray = window.location.pathname.split( '/' );
 // ["", "questions", "21246818", "how-to-get-the-base-url-in-javascript"]
+
 // bikin koma pada nomer
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+ // fungsi bikin + di header detailnya
+function buatPlus(tampung,numnya) {
+    if(isNaN(Number(numnya)) === true)
+    {
+        char = '<th class="heading_a md-color-indigo-900">'+numnya+'</th>';
+        tampung.push(char);
+    }else {
+        char = '<th class="heading_a md-color-indigo-900">+'+Number(numnya)+'</th>';
+        tampung.push(char);
+    }
+}
 
+// fungsi hitung rate yang sudah di markup
+function rateMark(rate,ratemarkup,curency,ratearr) {
+    var finalrate = parseInt(rate) + parseInt(ratemarkup)
+    if (curency === 'IDR' && finalrate !== 0)
+    {
+        data = '<th>Rp.'+numberWithCommas(finalrate)+'</th>';
+        ratearr.push(data);
+    }else {
+        data = '<th>'+numberWithCommas(finalrate)+'</th>';
+        ratearr.push(data);
+    }
+}
 $(document).ready(function () {
 // function genTag(elem,classnya = "",idnya = "",isi = "") {
 //     var tag = '<'+elem+' class="'+classnya+' id="'+idnya+'>'+isi+'</'+elem+'>';
@@ -61,9 +85,6 @@ $(document).ready(function () {
             var dataItem = this.dataItem(e.item.index());
             // console.log(dataItem);
             var viewnya = '<li class="uk-animation-slide-right">'+
-                '<a href="#" class="md-list-addon-element">'+
-                '<i class="material-icons md-48 uk-text-warning">flight takeoff</i>'+
-                '</a>'+
                 '<div class="md-list-content">'+
                 '<span class="md-list-heading heading_b">'+dataItem.vendorname+'</span>'+
                 '<span class="uk-text-primary uk-text-muted sub-heading uk-text-muted">+'+
@@ -72,6 +93,7 @@ $(document).ready(function () {
                 ' Id :'+dataItem.cityid+
                 ' Country :'+dataItem.countryname+
                 '</span>'+
+                '<img class="inputlogo" src="'+base_url+'/asset/rate_app/img/airlogo/'+dataItem.imgName+'">'+
                 '</div>'+
                 '</li>';
             $('#priview ul').html(viewnya);
@@ -229,6 +251,7 @@ $(document).ready(function () {
                 $('#viewratenya').attr('hidden','true').addClass('uk-animation-slide-left');
                 $('#tabs_1 > .statrate').empty();
                 $("#priview ul, #viewOrigin ul, #viewdest ul").empty();
+                $('li > a > sup').empty(); // empty hitungan tab
         });
 
     // ajax untuk buat tab menu
@@ -297,37 +320,30 @@ $(document).ready(function () {
                                     $("#sup-"+v.Name).html(v.jumlah);
                                 }
                             });
-                            $.each(data, function (i, v) {
 
-                                // looping detailnya buat di tempel bro
+                            // looping header pertama
+                            $.each(data, function (i, v) {
                                 var charge = []
                                 var ratenya = []
+                                // looping detailnya buat di tempel bro
                                 $.each(v.detail, function (i,val) {
-                                    if(Number.isInteger(val.charge)=== true)
-                                    {
-                                        char = '<th> +'+val.charge+'</th>';
-                                        charge.push(char);
-                                    }else {
-                                        char = '<th class="heading_a md-color-indigo-900" style="font-weight: bolder;">'+val.charge+'</th>';
-                                        charge.push(char);
-                                    }
-                                    // hitung final rate
-                                    var finalrate = parseInt(val.rate) + parseInt(val.ratemarkup)
-                                    rate = '<th>'+numberWithCommas(finalrate)+'</th>';
-                                    ratenya.push(rate);
-                                    // console.log(val);
+                                    // panggil fungsi buat plus
+                                    buatPlus(charge,val.charge);
+                                    // hitung final rate cost dengan parameter (rate,ratemarkup,curency,ratearr)
+                                    rateMark(val.rate,val.ratemarkup,val.IdCur,ratenya);
                                 });
+
                                 var hdview =
                                     '<div class="uk-grid uk-grid-divider zebra">' +
                                     '<div class="uk-width-1-3">'+
                                     '<p class="heading_b uk-text-bold md-color-indigo-A700" style="font-weight:bolder;">'+v.carrier+'</p>'+
                                     '</div>'+
                                     '<div class="uk-width-1-4">'+
-                                    '<p class="heading_b uk-text-bold md-color-indigo-A700">'+v.comodity+'</p>'+
+                                    '<p class="heading_b uk-text-bold md-color-indigo-A700">Comodity '+v.comodity+'</p>'+
                                     '</div>'+
                                     '<div class="uk-width-1-4">'+
                                     '<p class="uk-text-primary uk-text-small FontBig">Frequency :<span class="md-color-grey-900">'+v.frequency+'</span><br>'+
-                                    '<span class="uk-text-primary">Lead Time <span class="md-color-grey-900">'+v.leadtime+' Day</span><br></span>'+
+                                    '<span class="uk-text-primary">Lead Time <span class="md-color-grey-900">'+v.leadtime+'</span><br></span>'+
                                     '<span class="uk-text-primary">Valid Until <span class="md-color-grey-900">'+v.validuntil+'</span></span></p>'+
                                     '</div>' +
                                     '<div class="uk-width-1-1" id="tbl_dtl">' +
@@ -349,8 +365,10 @@ $(document).ready(function () {
                                     '</div>'+
                                     '</div>' +
                                     '</div>';
-                                $('#orgview').html(v.origin);
-                                $('#dstview').html(v.destination);
+                                var org = v.portname.orgname.Name;
+                                var dst = v.portname.dstname.Name;
+                                $('#orgview').html(org.toUpperCase()+'('+v.portname.orgname.Codes+')');
+                                $('#dstview').html(dst.toUpperCase()+'('+v.portname.dstname.Codes+')');
                                 $(hdview).appendTo('#hdrate');
 
                             });
@@ -391,22 +409,16 @@ function tabview(valnya) {
         },
         success:function (result) {
             $.each(result, function (i, v) {
+                
                 // get json object detail
                 var charge = []
                 var ratenya = []
                 $.each(v.detail, function (i,val) {
-                    if(Number.isInteger(val.charge)=== true)
-                    {
-                        char = '<th> +'+val.charge+'</th>';
-                        charge.push(char);
-                    }else {
-                        char = '<th class="heading_a md-color-indigo-900">'+val.charge+'</th>';
-                        charge.push(char);
-                    }
-                    // hitung final rate
-                    var finalrate = parseInt(val.rate) + parseInt(val.ratemarkup)
-                    rate = '<th>'+numberWithCommas(finalrate)+'</th>';
-                    ratenya.push(rate);
+                    // console.log(typeof(val.charge))
+                    // panggil fungsi buat plus
+                    buatPlus(charge,val.charge);
+                    // hitung final rate cost dengan parameter (rate,ratemarkup,curency,ratearr)
+                    rateMark(val.rate,val.ratemarkup,val.IdCur,ratenya);
                     // console.log(val);
                 });
                 // console.log(v);
@@ -416,11 +428,11 @@ function tabview(valnya) {
                     '<p class="heading_b uk-text-bold md-color-indigo-A700" style="font-weight:bolder;">'+v.carrier+'</p>'+
                     '</div>'+
                     '<div class="uk-width-1-4">'+
-                    '<p class="heading_b uk-text-bold md-color-indigo-A700">'+v.comodity+'</p>'+
+                    '<p class="heading_b uk-text-bold md-color-indigo-A700">Comodity '+v.comodity+'</p>'+
                     '</div>'+
                     '<div class="uk-width-1-4">'+
                     '<p class="uk-text-primary uk-text-small FontBig">Frequency :<span class="md-color-grey-900">'+v.frequency+'</span><br>'+
-                    '<span class="uk-text-primary">Lead Time <span class="md-color-grey-900">'+v.leadtime+' Day</span><br></span>'+
+                    '<span class="uk-text-primary">Lead Time <span class="md-color-grey-900">'+v.leadtime+'</span><br></span>'+
                     '<span class="uk-text-primary">Valid Until <span class="md-color-grey-900">'+v.validuntil+'</span></span></p>'+
                     '</div>' +
                         '<div class="uk-width-1-1" id="tbl_dtl">' +
@@ -442,8 +454,10 @@ function tabview(valnya) {
                     '</div>'+
                     '</div>' +
                     '</div>'; // end of zebra...
-                $('#orgview').html(v.origin);
-                $('#dstview').html(v.destination);
+                var org = v.portname.orgname.Name;
+                var dst = v.portname.dstname.Name;
+                $('#orgview').html(org.toUpperCase()+'('+v.portname.orgname.Codes+')');
+                $('#dstview').html(dst.toUpperCase()+'('+v.portname.dstname.Codes+')');
                 $(hdview).appendTo('#tabs_1 > #'+valnya);
 
                 // buat zebra uk-accordion-title-primary

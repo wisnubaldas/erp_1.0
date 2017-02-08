@@ -23,6 +23,7 @@ class Retrieve_data_model extends CI_Model
             $this->db->select('msvendor_hdr.Id as vendorid,
                                 msvendor_hdr.Name as vendorname,
                                 msvendor_hdr.Address as address,
+                                msvendor_hdr.imgName,
                                 mscity.Id as cityid,
                                 mscity.Name as cityname,
                                 mscountry.Id as countryid,
@@ -73,7 +74,8 @@ class Retrieve_data_model extends CI_Model
                                 trcost_hdr.IdOriPort as origin , trcost_hdr.IdDestPort as destination,
                                 trcost_hdr.Frequency as frequency , trcost_hdr.IdComm as comodity,
                                 trcost_hdr.LeadTime as leadtime , trcost_hdr.ValidTo as validuntil,
-                                mscost_type.Name as tipecostname, mscost_type.Id as idscheme, trcost_hdr.Remarks as remarkhdr')
+                                mscost_type.Name as tipecostname, mscost_type.Id as idscheme, 
+                                trcost_hdr.Remarks as remarkhdr')
             ->from('trcost_hdr')
             ->join('msvendor_hdr', 'msvendor_hdr.Id = trcost_hdr.IdVendor')
             ->join('mscost_type', 'mscost_type.Id = trcost_hdr.IdCostType')
@@ -84,13 +86,23 @@ class Retrieve_data_model extends CI_Model
         $result = [];
         foreach ($headernya as $v)
         {
-//    replace array jika ada custom search
+            // cari nama port untuk header
+//            $data_in = [$v['origin'],$v['destination']];
+//            $q_portname = $this->db->where_in('Codes',$data_in)
+//                                    ->select('Codes,Name')
+//                                    ->from('msport')
+//                                    ->get();
+            $a = "SELECT  Codes, Name FROM msport AS s WHERE Codes =".$this->db->escape($v['origin'])."UNION SELECT  Codes,Name FROM msport AS s WHERE Codes=".$this->db->escape($v['destination']);
+            $q_portname = $this->db->query($a);
+            $ordes = $q_portname->result_array();
+
+            // replace array jika ada custom search
             $v = array_replace($v,$custom);
             $query = $this->db->where('IdCostHeader', $v['IDnya'])
-                ->select('IdCostHeader as id, IdSubCostName as charge, Amount as rate, MarkUpValue as ratemarkup, Remarks as remark')
+                ->select('IdCostHeader as id, IdSubCostName as charge, Amount as rate, MarkUpValue as ratemarkup, Remarks as remark, IdCur')
                 ->from('trcost_dtl')
                 ->get();
-            $detailnya = $query->result_array();
+
             $IDnya = $v['IDnya'];
             $idscheme = $v['idscheme'];
             $alias = $v['alias'];
@@ -102,11 +114,12 @@ class Retrieve_data_model extends CI_Model
             $origin = $v['origin'];
             $validuntil = $v['validuntil'];
             $remarkhdr = $v['remarkhdr'];
-            $totalscm = $totalscheme->result_array();
-            $detail = $detailnya;
+            $portname = ['orgname'=>$ordes[0],'dstname'=>$ordes[1]]; // array buat portname
+            $totalscm = $totalscheme->result_array(); // array total scheme
+            $detail = $query->result_array(); // array detailnya
 //            $inject = [$idscheme = array_merge($data)];
                 array_push($result, compact('idscheme','IDnya','alias','carrier','comodity',
-                'destination','frequency','leadtime','origin','validuntil','remarkhdr', 'totalscm','detail'));
+                'destination','frequency','leadtime','origin','validuntil','remarkhdr', 'portname','totalscm','detail'));
         }
         return $result;
     }
@@ -114,6 +127,7 @@ class Retrieve_data_model extends CI_Model
     {
         $query = $this->db
             ->where('isDefault',0)
+            ->where('IdService',005)
             ->select('Id,Name')
             ->from('mscost_type')
             ->get();

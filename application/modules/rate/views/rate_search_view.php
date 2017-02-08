@@ -9,7 +9,7 @@
     <div class="uk-width-4-10">
         <div class="md-input-wrapper">
             <label>Origin</label>
-            <input class="md-input label-fixed k-input"  type="text" id="origin" name="origin" >
+            <input class="md-input label-fixed k-input"  type="text" id="origin" name="origin">
             <input type="text" id="org" name="org" hidden>
             <span class="md-input-bar"></span>
         </div>
@@ -25,12 +25,12 @@
             <input class="md-input label-fixed k-input"  type="text" id="airlines" name="airlines">
             <span class="md-input-bar"></span>
         </div>
-        <span class="uk-form-help-block md-color-indigo-900" style="padding: 0px; margin: 0px;">Leave blank for ALL Airlines</span>
+        <span class="uk-form-help-block md-color-pink-500" style="padding: 0px; margin: 0px;">Leave blank for ALL Airlines</span>
     </div>
 <!--    en of 4-10-->
     <div class="uk-width-6-10">
         <div id="priview">
-            <ul class="md-list md-list-addon md-list-right">
+            <ul class="md-list">
 
             </ul>
         </div>
@@ -65,13 +65,15 @@
                     <hr class="horizontal" />
 <!--                    tampilan heading nya -->
                     <div class="uk-grid">
-                        <div class="uk-width-2-6">
+                        <div class="uk-width-2-4">
                             <p class="uk-text-primary">Origin
-                                <span class="uk-text-large md-color-indigo-900" id="orgview" style="font-size: x-large; font-weight:bolder;"></span></br>
-                                <span class="uk-text-primary">Destination <span style="font-size: x-large; font-weight:bolder;" class="uk-text-large md-color-indigo-900" id="dstview"></span></span>
+                                <span class="md-color-indigo-900" id="orgview" style="font-size: large; font-weight:bolder;"></span></br>
+                                <span class="uk-text-primary">Destination
+                                    <span style="font-size: large; font-weight:bolder;" class="md-color-indigo-900" id="dstview"></span>
+                                </span>
                             </p>
                         </div>
-                        <div class="uk-width-2-3">
+                        <div class="uk-width-2-4">
                             <span class="uk-text-italic">Notes :
                             <ul class="uk-text-italic uk-text-small">
                                 <li>All in IDR (Indonesia Rupiah)</li>
@@ -85,7 +87,6 @@
                     <div class="uk-width-1-1">
                             <div class="uk-width-1-1 uk-row-first">
                                 <ul class="uk-tab" data-uk-tab="{connect:'#tabs_1'}">
-
                                     <li class="uk-active"><a href="">SCHEME <sup class="uk-badge uk-badge-notification uk-badge-danger" id="sup-001" style="padding: 0px; margin: 0px;"></sup></a></li>
                                 </ul>
                                 <ul id="tabs_1" class="uk-switcher uk-margin">

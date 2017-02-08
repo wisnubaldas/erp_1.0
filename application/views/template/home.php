@@ -222,7 +222,8 @@ div .uk-badge-circle{
         <div class="uk-width-medium-1-4">
             <label class="mdlabel"><i class="material-icons">assessment</i> Rate</label>
             <ul>
-                <li><a href="<?php echo base_url('rate/rate_search');?>">Search Rate</a></li>
+                <li><a href="<?php echo base_url('rate/rate_search');?>">Search Air Rate</a></li>
+                <li><a href="<?php echo base_url('rate/rate_search/ocean');?>">Search Ocean Rate</a></li>
             </ul>
         </div>
     </div>

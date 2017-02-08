@@ -38,7 +38,6 @@ class Fetching_data extends CI_Controller
                 $portid = $value['id'];
                 $portcode = $value['PortCode'];
                 $portname = ucwords($value['PortName']);
-//                $cityid = ;
                 $cityname = ucwords($value['CityName']);
 //                $countryid = $value['countryid'];
                 $countryname = ucwords(strtolower($value['CouName']));

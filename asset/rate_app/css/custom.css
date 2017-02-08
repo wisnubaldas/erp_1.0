@@ -47,3 +47,10 @@ select.md-input, textarea.md-input, input.md-input:not([type]), input.md-input[t
 .rateview {
     visibility: hidden;
 }
+.inputlogo{
+    padding: 0px;
+    margin: 0px;
+    position:absolute;
+    top: 0;
+    right: 0;
+}
